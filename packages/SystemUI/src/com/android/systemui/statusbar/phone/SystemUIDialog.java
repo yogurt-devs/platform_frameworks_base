@@ -23,6 +23,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.Insets;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -50,6 +53,9 @@ import com.android.systemui.shared.system.QuickStepContract;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import eightbitlab.com.blurview.BlurView;
+import eightbitlab.com.blurview.RenderScriptBlur;
 
 /**
  * Base class for dialogs that should appear over panels and keyguard.
@@ -126,6 +132,20 @@ public class SystemUIDialog extends AlertDialog implements ViewRootImpl.ConfigCh
         mLastConfigurationWidthDp = config.screenWidthDp;
         mLastConfigurationHeightDp = config.screenHeightDp;
         updateWindowSize();
+    float radius = 20f;
+    View decorView = getWindow().getDecorView();
+    // ViewGroup you want to start blur from. Choose root as close to BlurView in hierarchy as possible.
+    ViewGroup rootView = (ViewGroup) decorView.findViewById(android.R.id.content);
+
+    // Optional:
+    // Set drawable to draw in the beginning of each blurred frame.
+    // Can be used in case your layout has a lot of transparent space and your content
+    // gets a too low alpha value after blur is applied.
+    Drawable windowBackground = decorView.getBackground();
+
+    blurView.setupWith(rootView, new RenderScriptBlur(this)) // or RenderEffectBlur
+           .setFrameClearDrawable(windowBackground) // Optional
+           .setBlurRadius(radius)
 
         for (int i = 0; i < mOnCreateRunnables.size(); i++) {
             mOnCreateRunnables.get(i).run();
